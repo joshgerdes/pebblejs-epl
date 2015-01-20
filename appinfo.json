@@ -44,7 +44,7 @@
     "shortName": "EPL Scores",
     "uuid": "76fe14e9-146e-4a0c-a053-e28685b467ad",
     "versionCode": 1,
-    "versionLabel": "1.0",
+    "versionLabel": "1.1",
     "watchapp": {
         "watchface": false
     }
