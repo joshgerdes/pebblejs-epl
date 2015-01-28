@@ -10,7 +10,15 @@ Get up to the minute scores on the soccer/football matches happening today.
 
 View the app details [here][appstore].
 
+### Donate
 
+Do you enjoy this app? Why not buy me a beer or just help fund support with a donation.
+
+Bitcoin
+`19AjVvdXwX6AdtPXepLytGQuFLxFWxgNN1`
+
+Dogecoin
+`D9g27McqAU4xm2DM2rD6XgKYsMupt6YNQL`
 
 ### Screenshots
 
