@@ -5,6 +5,8 @@
  **/
 
 var EPL = (function () {
+  var VERSION = 'v1.2';
+  var REFRESH_DELAY_TIME = 60000;
   var UI = require('ui');
   var ajax = require('ajax');
   var Vector2 = require('vector2');
@@ -54,10 +56,22 @@ var EPL = (function () {
       textAlign:'center'
     });
     
+    var version = new UI.Text({
+      position: new Vector2(110, 0),
+      size: new Vector2(30, 18),
+      text: VERSION,
+      font:'gothic-14',
+      color:'black',
+      textOverflow:'wrap',
+      textAlign:'right'
+    });
+    
     // Add to splashWindow and show
     splashWindow.add(splash);
-    splashWindow.add(text);
-    splashWindow.add(logo);  
+    splashWindow.add(text);   
+    splashWindow.add(logo); 
+    splashWindow.add(version);
+    splashWindow.show();
   };
   
   var initMain = function() {
@@ -95,44 +109,15 @@ var EPL = (function () {
       });
       detailWindow.add(status);
       
-      var VTLogo = new UI.Image({ 
-        position: new Vector2(0, 20), 
-        size: new Vector2(47, 47),
-        image: g.VT.logo
-      });
-      detailWindow.add(VTLogo);
-      
-      var VTName = new UI.Text({
-        position: new Vector2(0, 64), 
-        size: new Vector2(144, 24),
-        text: g.VT.name,
-        font:'gothic-24-bold',
-        color:'black',
-        textOverflow:'wrap',
-        textAlign:'left'
-      });
-      detailWindow.add(VTName);
-      
-      var VTScore = new UI.Text({
-        position: new Vector2(80, 20), 
-        size: new Vector2(42, 84),
-        text: g.VT.score,
-        font:'bitham-42-bold',
-        color:'black',
-        textOverflow:'wrap',
-        textAlign:'right'
-      });
-      detailWindow.add(VTScore);
-      
       var HTLogo = new UI.Image({ 
-        position: new Vector2(0, 91), 
+        position: new Vector2(0, 20), 
         size: new Vector2(47, 47),
         image: g.HT.logo
       });
       detailWindow.add(HTLogo);
       
       var HTName = new UI.Text({
-        position: new Vector2(0, 135), 
+        position: new Vector2(0, 64), 
         size: new Vector2(144, 24),
         text: g.HT.name,
         font:'gothic-24-bold',
@@ -143,7 +128,7 @@ var EPL = (function () {
       detailWindow.add(HTName);
       
       var HTScore = new UI.Text({
-        position: new Vector2(80, 91), 
+        position: new Vector2(80, 20), 
         size: new Vector2(42, 84),
         text: g.HT.score,
         font:'bitham-42-bold',
@@ -152,6 +137,35 @@ var EPL = (function () {
         textAlign:'right'
       });
       detailWindow.add(HTScore);
+      
+      var VTLogo = new UI.Image({ 
+        position: new Vector2(0, 91), 
+        size: new Vector2(47, 47),
+        image: g.VT.logo
+      });
+      detailWindow.add(VTLogo);
+      
+      var VTName = new UI.Text({
+        position: new Vector2(0, 135), 
+        size: new Vector2(144, 24),
+        text: g.VT.name,
+        font:'gothic-24-bold',
+        color:'black',
+        textOverflow:'wrap',
+        textAlign:'left'
+      });
+      detailWindow.add(VTName);
+      
+      var VTScore = new UI.Text({
+        position: new Vector2(80, 91), 
+        size: new Vector2(42, 84),
+        text: g.VT.score,
+        font:'bitham-42-bold',
+        color:'black',
+        textOverflow:'wrap',
+        textAlign:'right'
+      });
+      detailWindow.add(VTScore);
       
       // Show game details
       detailWindow.show();
@@ -248,7 +262,7 @@ var EPL = (function () {
         
         // Add menu item for game
         menuItems.push({
-          title: gameObj.VT.alias + ' ' + gameObj.VT.score + ' - ' + gameObj.HT.alias + ' ' + gameObj.HT.score,
+          title: gameObj.HT.alias + ' ' + gameObj.HT.score + ' - ' + gameObj.VT.alias + ' ' + gameObj.VT.score,
           subtitle: gameObj.display1 + ' ' + gameObj.display2
         });
       }
@@ -258,15 +272,32 @@ var EPL = (function () {
     });
   };
   
+  var refreshData = function() {
+    // Setup refresh data loop
+    setTimeout(function () {
+        loadData();
+        refreshData();
+    }, REFRESH_DELAY_TIME);
+  };
+  
   var init = function() {
+    // Initialize windows
     initSplash();
     initMain(); 
     
-    loadData();
-
-    // Hide splash and show score list
-    mainMenu.show();
-    splashWindow.hide();
+    var splashDelay = setTimeout(function() { 
+      // Load initial data
+      loadData();
+      
+      // Hide splash and show score list
+      mainMenu.show();
+      splashWindow.hide(); 
+      
+      // Start refresh data loop
+      refreshData();
+      
+      clearTimeout(splashDelay);
+    }, 2000);
   };
 
   return {
