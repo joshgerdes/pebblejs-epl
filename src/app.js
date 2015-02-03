@@ -5,7 +5,7 @@
  **/
 
 var EPL = (function () {
-  var VERSION = 'v1.2';
+  var VERSION = 'v1.3';
   var REFRESH_DELAY_TIME = 60000;
   var UI = require('ui');
   var ajax = require('ajax');
@@ -237,24 +237,27 @@ var EPL = (function () {
 
         // Add adjust for current GMT timezone, all times EST from nbcsports 
         if (gameObj.status.toLowerCase() != 'in-progress' && gameObj.display1.indexOf(':') > -1) {
-          // Determine the new time offset
-          var offsetDiff = Math.abs(data_tz_offset - curr_tz_offset);
-          var new_tz_offset = (curr_tz_offset > data_tz_offset) ? data_tz_offset + offsetDiff : data_tz_offset - offsetDiff;
-          
-          // Get adjust data time based on offset
-          var parts = gameObj.display1.substring(gameObj.display1, gameObj.display1.indexOf(' ')).split(':');
-          parts[0] = (gameObj.display1.indexOf('PM') > -1) ? +parts[0] + 12 : parts[0];
-          var d = new Date();
-          d.setHours(+parts[0] - 1, +parts[1]);
-          var utc = d.getTime() + (d.getTimezoneOffset() * 60000);
-          var newDate = new Date(utc + (3600000*new_tz_offset));
-          var hh = newDate.getHours().toString();
-          var mm = newDate.getMinutes().toString();
-          var newTime = ((+hh > 12 ) ? +hh - 12 : hh) + ':' + (mm[1] ? mm : '0' + mm[0]);
-          newTime += (+hh > 12) ? ' PM' : ' AM';
-          
-          gameObj.display1 = newTime;
-          gameObj.display2 = '';
+            // Determine difference from data offset to current offset
+            var diff = Math.abs(data_tz_offset - curr_tz_offset);
+            var diff_offset = (curr_tz_offset > data_tz_offset) ? diff : -diff;
+            
+            // Adjust data time based on offset difference
+            var parts = gameObj.display1.substring(gameObj.display1, gameObj.display1.indexOf(' ')).split(':');
+            parts[0] = (gameObj.display1.indexOf('PM') > -1) ? +parts[0] + 12 : parts[0];
+            parts[0] = +parts[0] + diff_offset;
+            parts[0] = (parts[0] > 24) ? parts[0] - 24 : parts[0];
+            parts[0] = (parts[0] < 0) ? parts[0] + 24 : parts[0];
+            
+            // Display new time using 12-hr display
+            var d = new Date();
+            d.setHours(+parts[0], +parts[1], 0, 0);
+            var hh = d.getHours().toString();
+            var mm = d.getMinutes().toString();  
+            var newTime = ((+hh > 12 ) ? +hh - 12 : hh) + ':' + (mm[1] ? mm : '0' + mm[0]);
+            newTime += (+hh > 12) ? ' PM' : ' AM';
+
+            gameObj.display1 = newTime;
+            gameObj.display2 = '';
         }
         
         // Add game object to matches array
